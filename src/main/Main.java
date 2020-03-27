@@ -1,10 +1,13 @@
-package sample;
+package main;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import metier.SimpleFTP;
+
+import java.io.File;
 
 public class Main extends Application {
 
@@ -18,7 +21,22 @@ public class Main extends Application {
     }
 
 
-    public static void main(String[] args) {
-        launch(args);
+    public static void main(String[] args){
+        // launch(args);
+        SimpleFTP clientFtp = new SimpleFTP();
+
+        try
+        {
+            clientFtp.connect("127.0.0.1",21,"nassim","369001");
+
+            Thread.sleep(5000);
+            File file= new File("src/resources/test-envoie-fichier.txt");
+            clientFtp.stor(file);
+            //clientFtp.disconnect();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 }
