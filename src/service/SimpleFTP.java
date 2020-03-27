@@ -1,6 +1,7 @@
 package service;
 
-import connection.ConnectionModel;
+import main.ConnectionModel;
+import observable.ObservableStringBuffer;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -33,11 +34,13 @@ public class SimpleFTP {
 
     private static boolean DEBUG = true;
 
+    private ObservableStringBuffer buffer;
+
     /**
      * Create an instance of SimpleFTP.
      */
     public SimpleFTP() {
-
+        buffer =ObservableStringBuffer.getInstance();
     }
 
     /**
@@ -77,6 +80,7 @@ public class SimpleFTP {
 
         String response = readLine();
         System.out.println(" response : "+response);
+        buffer.append(" response : "+response);
         if (!response.startsWith("220")) {
             throw new IOException(
                     "SimpleFTP received an unknown response when connecting to the FTP server: "
@@ -113,6 +117,7 @@ public class SimpleFTP {
         } finally {
             socket = null;
             System.out.println("Déconnecté du serveur");
+            buffer.append("Déconnecté du serveur");
         }
     }
 
@@ -250,6 +255,8 @@ public class SimpleFTP {
             writer.flush();
             if (DEBUG) {
                 System.out.println("> " + line);
+                if(!line.startsWith("PASS"))
+                    buffer.append("> " + line);
             }
         } catch (IOException e) {
             socket = null;
@@ -261,6 +268,11 @@ public class SimpleFTP {
         String line = reader.readLine();
         if (DEBUG) {
             System.out.println("< " + line);
+            if(!line.startsWith("PASS"))
+            {
+                buffer.append("< " + line);
+            }
+
         }
         return line;
     }
