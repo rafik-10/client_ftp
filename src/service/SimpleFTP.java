@@ -1,4 +1,6 @@
-package metier;
+package service;
+
+import connection.ConnectionModel;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -51,6 +53,12 @@ public class SimpleFTP {
      */
     public synchronized void connect(String host, int port) throws IOException {
         connect(host, port, "anonymous", "anonymous");
+    }
+
+    public synchronized void connect(ConnectionModel connectionModel) throws IOException
+    {
+        connect(connectionModel.getHote(), connectionModel.getPort(), connectionModel.getId(),
+            connectionModel.getPasswd());
     }
 
     /**
