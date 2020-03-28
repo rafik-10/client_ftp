@@ -7,6 +7,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -83,7 +84,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Hôte :" GridPane.halignment="RIGHT" />
+                  <Label text="Hôte : " GridPane.halignment="RIGHT" />
                   <Label text="Identifiant : " GridPane.columnIndex="2" GridPane.halignment="RIGHT" />
                   <Label text="Mot de passe : " GridPane.columnIndex="4" GridPane.halignment="RIGHT" />
                   <Label text="Port : " GridPane.columnIndex="6" GridPane.halignment="RIGHT" />
@@ -94,6 +95,7 @@
                   <Button fx:id="connecterBtn" mnemonicParsing="false" onAction="#seConnecter" text="Se connecter" GridPane.columnIndex="8" GridPane.halignment="CENTER" />
                </children>
             </GridPane>
+            <SplitPane fx:id="fileExplorerSP" prefHeight="160.0" prefWidth="200.0" GridPane.rowIndex="2" />
          </children>
       </GridPane>
   </children>

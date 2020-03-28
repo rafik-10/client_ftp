@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
 /**
@@ -26,7 +27,7 @@ import java.util.StringTokenizer;
  */
 public class SimpleFTP {
 
-    private Socket socket = null;
+    private Socket socket , socketData= null;
 
     private BufferedReader reader = null;
 
@@ -35,6 +36,11 @@ public class SimpleFTP {
     private static boolean DEBUG = true;
 
     private ObservableStringBuffer buffer;
+
+    private BufferedInputStream readerData;
+
+    private String dataIP;
+    private int dataPort;
 
     /**
      * Create an instance of SimpleFTP.
@@ -70,6 +76,7 @@ public class SimpleFTP {
      */
     public synchronized void connect(String host, int port, String user,
                                      String pass) throws IOException {
+
         if (socket != null) {
             throw new IOException("SimpleFTP is already connected. Disconnect first.");
         }
@@ -105,6 +112,8 @@ public class SimpleFTP {
                             + response);
         }
 
+        dataIP=host;
+        dataPort=port;
         // Now logged in.
     }
 
@@ -277,6 +286,84 @@ public class SimpleFTP {
         return line;
     }
 
+    public String list() throws IOException{
+        sendLine("TYPE ASCII");
+        readLine();
+
+        enterPassiveMode();
+        createDataSocket();
+        sendLine("LIST");
+
+        return readData();
+    }
+
+    /**
+     * Méthode permettant de lire les réponses du FTP
+     * @return
+     * @throws IOException
+     */
+    private String readData() throws IOException{
+
+        String response = "";
+        byte[] b = new byte[1024];
+        int stream;
+
+        while((stream = readerData.read(b)) != -1){
+            response += new String(b, 0, stream);
+        }
+
+        if(DEBUG)
+            log(response);
+        return response;
+    }
 
 
+    private void createDataSocket() throws UnknownHostException, IOException{
+        socketData = new Socket(dataIP, dataPort);
+        readerData = new BufferedInputStream(socketData.getInputStream());
+        //writerData = new BufferedWriter(new OutputStreamWriter(socketData.getOutputStream()));
+    }
+
+    private void log(String str){
+        System.out.println(">> " + str);
+    }
+    private void enterPassiveMode() throws IOException{
+
+        sendLine("PASV");
+        String response = readLine();
+        if(DEBUG)
+            log(response);
+        String ip = null;
+        int port = -1;
+
+        //On décortique ici la réponse retournée par le serveur pour récupérer
+        //l'adresse IP et le port à utiliser pour le canal data
+        int debut = response.indexOf('(');
+        int fin = response.indexOf(')', debut + 1);
+        if(debut > 0){
+            String dataLink = response.substring(debut + 1, fin);
+            StringTokenizer tokenizer = new StringTokenizer(dataLink, ",");
+            try {
+                //L'adresse IP est séparée par des virgules
+                //on les remplace donc par des points...
+                ip = tokenizer.nextToken() + "." + tokenizer.nextToken() + "."
+                        + tokenizer.nextToken() + "." + tokenizer.nextToken();
+
+                //Le port est un entier de type int
+                //mais cet entier est découpé en deux
+                //la première partie correspond aux 4 premiers bits de l'octet
+                //la deuxième au 4 derniers
+                //Il faut donc multiplier le premier nombre par 256 et l'additionner au second
+                //pour avoir le numéro de ports défini par le serveur
+                port = Integer.parseInt(tokenizer.nextToken()) * 256
+                        + Integer.parseInt(tokenizer.nextToken());
+                dataIP = ip;
+                dataPort = port;
+
+            } catch (Exception e) {
+                throw new IOException("SimpleFTP received bad data link information: "
+                        + response);
+            }
+        }
+    }
 }
