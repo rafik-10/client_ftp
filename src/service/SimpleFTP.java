@@ -31,7 +31,7 @@ public class SimpleFTP {
 
     private BufferedReader reader = null;
 
-    private BufferedWriter writer = null;
+    private BufferedWriter writer,writerData = null;
 
     private static boolean DEBUG = true;
 
@@ -112,8 +112,6 @@ public class SimpleFTP {
                             + response);
         }
 
-        dataIP=host;
-        dataPort=port;
         // Now logged in.
     }
 
@@ -255,7 +253,7 @@ public class SimpleFTP {
     /**
      * Sends a raw command to the FTP server.
      */
-    private void sendLine(String line) throws IOException {
+    public void sendLine(String line) throws IOException {
         if (socket == null) {
             throw new IOException("SimpleFTP is not connected.");
         }
@@ -273,7 +271,7 @@ public class SimpleFTP {
         }
     }
 
-    private String readLine() throws IOException {
+    public String readLine() throws IOException {
         String line = reader.readLine();
         if (DEBUG) {
             System.out.println("< " + line);
@@ -293,7 +291,8 @@ public class SimpleFTP {
         enterPassiveMode();
         createDataSocket();
         sendLine("LIST");
-
+        readLine();
+        readLine();
         return readData();
     }
 
@@ -302,7 +301,7 @@ public class SimpleFTP {
      * @return
      * @throws IOException
      */
-    private String readData() throws IOException{
+    public String readData() throws IOException{
 
         String response = "";
         byte[] b = new byte[1024];
@@ -318,16 +317,18 @@ public class SimpleFTP {
     }
 
 
-    private void createDataSocket() throws UnknownHostException, IOException{
+    public void createDataSocket() throws UnknownHostException, IOException{
+
         socketData = new Socket(dataIP, dataPort);
         readerData = new BufferedInputStream(socketData.getInputStream());
-        //writerData = new BufferedWriter(new OutputStreamWriter(socketData.getOutputStream()));
+        writerData = new BufferedWriter(new OutputStreamWriter(socketData.getOutputStream()));
+
     }
 
     private void log(String str){
         System.out.println(">> " + str);
     }
-    private void enterPassiveMode() throws IOException{
+    public void enterPassiveMode() throws IOException{
 
         sendLine("PASV");
         String response = readLine();
@@ -363,6 +364,26 @@ public class SimpleFTP {
             } catch (Exception e) {
                 throw new IOException("SimpleFTP received bad data link information: "
                         + response);
+            }
+        }
+    }
+
+    @Deprecated
+    public void closeDataSocket(){
+        try {
+            sendLine("QUIT");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }  finally{
+            if(socketData != null){
+                try {
+                    socketData.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finally{
+                    socketData = null;
+                }
             }
         }
     }

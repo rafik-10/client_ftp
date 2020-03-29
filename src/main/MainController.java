@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import observable.ObservableStringBuffer;
+import service.RemoteFileExplorer;
 import service.SimpleFTP;
 
 import java.io.File;
@@ -46,7 +47,7 @@ public class MainController extends Application implements Initializable {
     @FXML
     private SplitPane fileExplorerSP;
 
-    private TreeView<File> remoteFilesTV;
+    private TreeView<String> remoteFilesTV;
 
     public MainController()
     {
@@ -88,7 +89,7 @@ public class MainController extends Application implements Initializable {
 
         TreeView<File> localFilesTV = new TreeView<File>(
                 new SimpleFileTreeItem(new File("C:\\")));
-        remoteFilesTV=new TreeView<File>();
+        remoteFilesTV=new TreeView(new RemoteFileExplorer(simpleFTP,"/")) ;
 
         fileExplorerSP.getItems().add(localFilesTV);
         fileExplorerSP.getItems().add(remoteFilesTV);
