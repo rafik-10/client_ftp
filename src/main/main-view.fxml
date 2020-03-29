@@ -89,8 +89,8 @@
                   <Label text="Mot de passe : " GridPane.columnIndex="4" GridPane.halignment="RIGHT" />
                   <Label text="Port : " GridPane.columnIndex="6" GridPane.halignment="RIGHT" />
                   <TextField fx:id="hoteTF" text="127.0.0.1" GridPane.columnIndex="1" />
-                  <TextField fx:id="idTF" text="nassim" GridPane.columnIndex="3" />
-                  <PasswordField fx:id="passwdPF" text="369001" GridPane.columnIndex="5" />
+                  <TextField fx:id="idTF" text="rafik" GridPane.columnIndex="3" />
+                  <PasswordField fx:id="passwdPF" text="rafik" GridPane.columnIndex="5" />
                   <TextField fx:id="portTF" text="21" GridPane.columnIndex="7" />
                   <Button fx:id="connecterBtn" mnemonicParsing="false" onAction="#seConnecter" text="Se connecter" GridPane.columnIndex="8" GridPane.halignment="CENTER" />
                </children>
